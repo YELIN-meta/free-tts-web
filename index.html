@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Free TTS Tool</title>
+</head>
+<body>
+  <h2>Free Text-to-Speech 🔊</h2>
+  <textarea id="text" rows="8" cols="60" placeholder="Enter text here..."></textarea><br>
+  
+  <label for="voiceSelect">Voice:</label>
+  <select id="voiceSelect"></select><br>
+  
+  <label for="rate">Rate:</label>
+  <input type="range" id="rate" min="0.5" max="2" step="0.1" value="1"><br>
+  
+  <button onclick="speakText()">Speak</button>
+
+  <script>
+    const synth = window.speechSynthesis;
+    const voiceSelect = document.getElementById('voiceSelect');
+
+    function populateVoices() {
+      const voices = synth.getVoices();
+      voiceSelect.innerHTML = '';
+      voices.forEach((voice, i) => {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = `${voice.name} (${voice.lang})${voice.default ? ' [default]' : ''}`;
+        voiceSelect.appendChild(option);
+      });
+    }
+
+    populateVoices();
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+      speechSynthesis.onvoiceschanged = populateVoices;
+    }
+
+    function speakText() {
+      const text = document.getElementById('text').value;
+      const rate = parseFloat(document.getElementById('rate').value);
+      const voices = synth.getVoices();
+      const selectedVoice = voices[parseInt(voiceSelect.value)];
+
+      if (synth.speaking) {
+        synth.cancel();
+      }
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.voice = selectedVoice;
+      utterance.rate = rate;
+      synth.speak(utterance);
+    }
+  </script>
+</body>
+</html>
